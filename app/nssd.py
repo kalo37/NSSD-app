@@ -87,8 +87,7 @@ def search():
             _source_include=["violence_tags"])['hits']['hits']
         num_hits_search = len(resp)
 
-    ratios = get_violence_ratios(get_all_docs(), resp).sort_values(
-        'ratio', ascending=False)
+    ratios = get_violence_ratios(get_all_docs(), resp)
     return render_template(
         'search.html', page='search', num_hits_search=num_hits_search,
         ratios=ratios.to_html(classes='table table-hover table-bordered'))
@@ -114,6 +113,10 @@ def get_violence_ratios(all_docs, resp):
         left_index=True, right_index=True)
     violence_ratios['ratio'] = violence_ratios.query_counts /\
         violence_ratios.total_counts
+
+    # Clean table for output
+    violence_ratios.sort_values('ratio', ascending=False, inplace=True)
+    violence_ratios.columns = ['# total documents', '# matches', 'Risk score']
     return violence_ratios
 
 
