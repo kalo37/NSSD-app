@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, g
+from flask import Flask, render_template, request, g
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 from flask_bootstrap import Bootstrap
 from flask_sslify import SSLify
