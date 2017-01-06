@@ -118,7 +118,10 @@ def get_violence_ratios(all_docs, resp):
 
     # Clean table for output
     violence_ratios.sort_values('ratio', ascending=False, inplace=True)
-    violence_ratios.columns = ['# total documents', '# matches', 'Risk score']
+    violence_ratios.ratio = (violence_ratios.ratio * 100).map(
+        '{:,.1f}%'.format)
+    violence_ratios.columns = [
+        '# total documents', '# matches', 'Risk score']
     return violence_ratios
 
 
