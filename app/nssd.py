@@ -79,8 +79,10 @@ def search():
 
         # Get a count of documents with matching search tags
         cname = request.form['search-terms']
-        query = {"query": {"terms": {
-            "search_tags": [s.strip() for s in cname.split(';')]}},
+        query = {"query": {"bool": {
+            "should": [
+                {"match": {"search_tags": s.strip()}}
+                for s in cname.split(';')]}},
             "_source": "search_tags", "size": 100}
         resp = es.search(
             'nssd', 'doc', query,
