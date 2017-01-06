@@ -92,7 +92,10 @@ def search():
     ratios = get_violence_ratios(get_all_docs(), resp)
     return render_template(
         'search.html', page='search', num_hits_search=num_hits_search,
-        ratios=ratios.to_html(classes='table table-hover table-bordered'))
+        ratios=ratios.to_html(
+            classes='table table-hover table-bordered', index=False
+        )
+    )
 
 
 def get_violence_ratios(all_docs, resp):
@@ -122,7 +125,11 @@ def get_violence_ratios(all_docs, resp):
         '{:,.1f}%'.format)
     violence_ratios.columns = [
         '# total documents', '# matches', 'Risk score']
-    return violence_ratios
+    violence_ratios['Types of Violence (CDC,WHO, NIH, DOJ)'] = \
+        violence_ratios.index
+    cols = list(violence_ratios.columns)
+    cols = [cols.pop()] + cols
+    return violence_ratios[cols]
 
 
 def count_violence_tags(resp):
