@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, g
+from flask import Flask, render_template, request, g
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 from flask_bootstrap import Bootstrap
 from flask_sslify import SSLify
@@ -79,8 +79,10 @@ def search():
 
         # Get a count of documents with matching search tags
         cname = request.form['search-terms']
-        query = {"query": {"terms": {
-            "search_tags": [s.strip() for s in cname.split(';')]}},
+        query = {"query": {"bool": {
+            "should": [
+                {"match": {"search_tags": s.strip()}}
+                for s in cname.split(';')]}},
             "_source": "search_tags", "size": 100}
         resp = es.search(
             'nssd', 'doc', query,
@@ -90,7 +92,10 @@ def search():
     ratios = get_violence_ratios(get_all_docs(), resp)
     return render_template(
         'search.html', page='search', num_hits_search=num_hits_search,
-        ratios=ratios.to_html(classes='table table-hover table-bordered'))
+        ratios=ratios.to_html(
+            classes='table table-hover table-bordered', index=False
+        )
+    )
 
 
 def get_violence_ratios(all_docs, resp):
@@ -116,8 +121,15 @@ def get_violence_ratios(all_docs, resp):
 
     # Clean table for output
     violence_ratios.sort_values('ratio', ascending=False, inplace=True)
-    violence_ratios.columns = ['# total documents', '# matches', 'Risk score']
-    return violence_ratios
+    violence_ratios.ratio = (violence_ratios.ratio * 100).map(
+        '{:,.1f}%'.format)
+    violence_ratios.columns = [
+        '# total documents', '# matches', 'Risk score']
+    violence_ratios['Types of Violence (CDC,WHO, NIH, DOJ)'] = \
+        violence_ratios.index
+    cols = list(violence_ratios.columns)
+    cols = [cols.pop()] + cols
+    return violence_ratios[cols]
 
 
 def count_violence_tags(resp):
