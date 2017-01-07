@@ -67,6 +67,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/ABD')
+def serve_ABD():
+    return render_template('ABD.html')
+
+
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
