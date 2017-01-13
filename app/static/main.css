@@ -12,11 +12,11 @@ body {
 }
 
 a {
-    color: #358997;
+    color: #348CB2;
 }
 
 a:hover {
-    color: #09414B;
+    color: #1777DF;
 }
 
 h1, h2, h3, h4, h5 {
@@ -96,12 +96,12 @@ h1, h2, h3, h4, h5 {
 }
 
 .btn-comp {
-    background-color: #2D7B82;
-    color: #e8e8e8;
+    background-color: #53A27F;
+    color: white;
 }
 
 .btn-comp:hover {
-    background-color: #09414B;
+    background-color: #348CB2;
     color: white;
 }
 
@@ -111,7 +111,7 @@ h1, h2, h3, h4, h5 {
 
 .footer {
   background: #F5F5F5;
-  border-top: 1px solid #5db18f;
+  border-top: 1px solid #1777DF;
   height: 60px;
   font-size: 14px;
 }
@@ -147,7 +147,7 @@ section {
 }
 
 hr {
-    border-color: #5db18f;
+    border-color: #1777DF;
     border-width: 3px;
     max-width: 70px;
 }
@@ -163,7 +163,7 @@ hr.light {
 }
 
 .blue-primary {
-    color: #2D7B82;
+    color: #53A27F;
 }
 
 .blue-secondary {
