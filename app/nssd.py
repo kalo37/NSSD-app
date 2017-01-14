@@ -68,6 +68,7 @@ def index():
 
 
 @app.route('/ABD')
+@login_required
 def serve_ABD():
     return render_template('ABD.html')
 
