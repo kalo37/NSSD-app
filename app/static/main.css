@@ -179,3 +179,23 @@ hr.light {
 .highligh-secondary {
    color: #BB9191;
 }
+
+span .fa-square {
+    color: #696969;
+}
+
+.btn-icon {
+  margin: 0 15px 0 0;
+}
+
+.fa-stack .fa-inverse {
+  color: #53A27F;
+}
+
+#contact .btn {
+  margin-top: 20px;
+}
+
+#contact span.fa-stack {
+  margin: -5px 5px -5px -5px;
+}
