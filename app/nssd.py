@@ -73,6 +73,11 @@ def serve_ABD():
     return render_template('ABD.html')
 
 
+@app.route('/about')
+def serve_about():
+    return render_template('about.html')
+
+
 @app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
