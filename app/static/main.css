@@ -193,7 +193,7 @@ span .fa-square {
 }
 
 #contact .btn {
-  margin-top: 20px;
+  margin-top: 5px;
 }
 
 #contact span.fa-stack {
@@ -204,6 +204,6 @@ form {
   margin-top: 30px;
 }
 
-#get-involved h4 {
+#get-involved h5 {
   margin-top: 30px;
 }
