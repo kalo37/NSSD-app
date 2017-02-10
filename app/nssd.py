@@ -1,66 +1,16 @@
-import os
-from flask import Flask, render_template, request, g
-from elasticsearch import Elasticsearch, RequestsHttpConnection
-from flask_bootstrap import Bootstrap
-from flask_sslify import SSLify
-from flask_stormpath import StormpathManager, login_required, user
-from collections import defaultdict
-import pandas as pd
+from flask import Flask, render_template, request
+from flask_stormpath import login_required, user
+
+from connect import get_all_docs, get_es
+from assess import get_violence_ratios, get_matches
+from config import set_config
 
 app = Flask(__name__)
-sslify = SSLify(app)
-Bootstrap(app)
-app.config.from_object(os.environ['APP_SETTINGS'])
-
-# OAuth credentials and configuration
-app.config['SECRET_KEY'] = os.environ['STORMPATH_SECRET_KEY']
-app.config['STORMPATH_API_KEY_ID'] = os.environ['STORMPATH_API_KEY_ID']
-app.config['STORMPATH_API_KEY_SECRET'] = os.environ['STORMPATH_API_KEY_SECRET']
-app.config['STORMPATH_APPLICATION'] = os.environ['STORMPATH_APPLICATION']
-app.config['STORMPATH_ENABLE_MIDDLE_NAME'] = False
-app.config['STORMPATH_ENABLE_FORGOT_PASSWORD'] = True
-stormpath_manager = StormpathManager(app)
-
+set_config(app)
 
 @app.context_processor
 def inject_user():
     return dict(is_authenticated=user.is_authenticated)
-
-
-# Connnect to AWS elasticsearch
-def _connect_es():
-    host = os.environ['ES_HOST']
-    es = Elasticsearch(
-        hosts=host,
-        verify_certs=True,
-        connection_class=RequestsHttpConnection
-    )
-    return es
-
-
-# Connnect to local elasticsearch
-def _connect_es_local():
-    es = Elasticsearch()
-    return es
-
-
-# Opens a new elasticsearch connection if there is none yet for the
-# current application context
-def get_es():
-    if not hasattr(g, 'es_node'):
-        g.es_node = _connect_es()
-    return g.es_node
-
-
-def get_all_docs():
-    if not hasattr(g, 'all_docs'):
-        es = get_es()
-        query = {"query": {"match_all": {}}, "size": 100}
-        g.all_docs = es.search(
-            'nssd', 'doc', query,
-            _source_include=["violence_tags"])['hits']['hits']
-    return g.all_docs
-
 
 @app.route('/', methods=['GET'])
 def index():
@@ -87,17 +37,8 @@ def search():
     resp = []
 
     if request.method == "POST":
-
         # Get a count of documents with matching search tags
-        cname = request.form['search-terms']
-        query = {"query": {"bool": {
-            "should": [
-                {"match": {"search_tags": s.strip()}}
-                for s in cname.split(';')]}},
-            "_source": "search_tags", "size": 100}
-        resp = es.search(
-            'nssd', 'doc', query,
-            _source_include=["violence_tags"])['hits']['hits']
+        resp = get_matches(es)
         num_hits_search = len(resp)
 
     ratios = get_violence_ratios(get_all_docs(), resp)
@@ -107,48 +48,6 @@ def search():
             classes='table table-hover table-bordered', index=False
         )
     )
-
-
-def get_violence_ratios(all_docs, resp):
-    sum_violence_tags = count_violence_tags(all_docs)
-    sum_violence_tags_df = pd.DataFrame.from_dict(
-        sum_violence_tags, orient='index')
-    sum_violence_tags_df.columns = ['total_counts']
-
-    if len(resp) > 0:
-        n_violence_tags = count_violence_tags(resp)
-        n_violence_tags_df = pd.DataFrame.from_dict(
-            n_violence_tags, orient='index')
-    else:
-        n_violence_tags_df = sum_violence_tags_df.copy()
-        n_violence_tags_df.ix[:, 0] = 0
-    n_violence_tags_df.columns = ['query_counts']
-
-    violence_ratios = pd.merge(
-        sum_violence_tags_df, n_violence_tags_df,
-        left_index=True, right_index=True)
-    violence_ratios['ratio'] = violence_ratios.query_counts /\
-        violence_ratios.total_counts
-
-    # Clean table for output
-    violence_ratios.sort_values('ratio', ascending=False, inplace=True)
-    violence_ratios.ratio = (violence_ratios.ratio * 100).map(
-        '{:,.1f}%'.format)
-    violence_ratios.columns = [
-        '# total documents', '# matches', 'Risk score']
-    violence_ratios['Types of Violence (CDC,WHO, NIH, DOJ)'] = \
-        violence_ratios.index
-    cols = list(violence_ratios.columns)
-    cols = [cols.pop()] + cols
-    return violence_ratios[cols]
-
-
-def count_violence_tags(resp):
-    violence_tags_counts = defaultdict(int)
-    for doc in resp:
-        for tag in doc['_source']['violence_tags']:
-            violence_tags_counts[tag] += 1
-    return violence_tags_counts
 
 
 @app.errorhandler(401)
