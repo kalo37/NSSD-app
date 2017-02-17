@@ -52,6 +52,7 @@ def get_matches(es):
         "should": [
             {"match": {"search_tags": {
                 'query': s.strip(),
+                "fuzziness": "AUTO",
                 "minimum_should_match": "50%"}}}
             for s in cname.split(';')]}},
         "_source": "search_tags", "size": max_docs}
