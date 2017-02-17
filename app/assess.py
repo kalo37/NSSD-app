@@ -50,7 +50,9 @@ def get_matches(es):
     cname = request.form['search-terms']
     query = {"query": {"bool": {
         "should": [
-            {"match": {"search_tags": s.strip()}}
+            {"match": {"search_tags": {
+                'query': s.strip(),
+                "minimum_should_match": "50%"}}}
             for s in cname.split(';')]}},
         "_source": "search_tags", "size": max_docs}
     resp = es.search(
