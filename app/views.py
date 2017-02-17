@@ -1,12 +1,10 @@
-from flask import Flask, render_template, request
+from flask import render_template, request
 from flask_stormpath import login_required, user
 
 from connect import get_all_docs, get_es
 from assess import get_violence_ratios, get_matches
-from config import set_config
+from app import app
 
-app = Flask(__name__)
-set_config(app)
 
 @app.context_processor
 def inject_user():
