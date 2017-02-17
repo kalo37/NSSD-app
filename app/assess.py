@@ -40,10 +40,10 @@ def get_violence_ratios(all_docs, resp):
 
 
 def count_violence_tags(resp):
-    violence_tags_counts = defaultdict(int)
+    violence_tags_counts = defaultdict(float)
     for doc in resp:
         for tag in doc['_source']['violence_tags']:
-            violence_tags_counts[tag] += 1
+            violence_tags_counts[tag] += doc['_score']
     return violence_tags_counts
 
 def get_matches(es):
