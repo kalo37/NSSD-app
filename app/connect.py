@@ -2,6 +2,8 @@ import os
 from flask import g
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
+from config import max_docs
+
 # Connnect to AWS elasticsearch
 def _connect_es():
     host = os.environ['ES_HOST']
@@ -30,7 +32,7 @@ def get_es():
 def get_all_docs():
     if not hasattr(g, 'all_docs'):
         es = get_es()
-        query = {"query": {"match_all": {}}, "size": 100}
+        query = {"query": {"match_all": {}}, "size": max_docs}
         g.all_docs = es.search(
             'nssd', 'doc', query,
             _source_include=["violence_tags"])['hits']['hits']

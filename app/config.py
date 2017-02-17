@@ -28,3 +28,5 @@ def set_config(app):
     StormpathManager(app)
 
     return db
+
+max_docs = 500
