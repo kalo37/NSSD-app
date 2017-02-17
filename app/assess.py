@@ -2,6 +2,8 @@ import pandas as pd
 from collections import defaultdict
 from flask import request
 
+from config import max_docs
+
 
 def get_violence_ratios(all_docs, resp):
     sum_violence_tags = count_violence_tags(all_docs)
@@ -38,19 +40,22 @@ def get_violence_ratios(all_docs, resp):
 
 
 def count_violence_tags(resp):
-    violence_tags_counts = defaultdict(int)
+    violence_tags_counts = defaultdict(float)
     for doc in resp:
         for tag in doc['_source']['violence_tags']:
-            violence_tags_counts[tag] += 1
+            violence_tags_counts[tag] += doc['_score']
     return violence_tags_counts
 
 def get_matches(es):
     cname = request.form['search-terms']
     query = {"query": {"bool": {
         "should": [
-            {"match": {"search_tags": s.strip()}}
+            {"match": {"search_tags": {
+                'query': s.strip(),
+                "fuzziness": "AUTO",
+                "minimum_should_match": "50%"}}}
             for s in cname.split(';')]}},
-        "_source": "search_tags", "size": 100}
+        "_source": "search_tags", "size": max_docs}
     resp = es.search(
         'nssd', 'doc', query,
         _source_include=["violence_tags"])['hits']['hits']
