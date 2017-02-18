@@ -65,7 +65,7 @@ def get_matches(es):
                 "fuzziness": "AUTO",
                 "minimum_should_match": "50%"}}}
             for s in cname.split(';')]}},
-        "_source": "search_tags", "size": max_docs}
+        "size": max_docs}
     resp = es.search(
         'nssd', 'doc', query,
         _source_include=["violence_tags"])['hits']['hits']
