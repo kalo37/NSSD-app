@@ -38,7 +38,6 @@
     {% if num_hits_search >= 0 %}
     <h2 style="margin-top: 30px;">Your results</h2>
     <p class="text-faded text-left">
-    {{ num_hits_search }} hits returned</p>
     <div class="table-responsive">
       <table class="table table-hover table-bordered risk-table">
 	<thead>
@@ -54,7 +53,8 @@
 	  <tr>
 	    <td>{{ index }}</td>
 	    <td>
-	      {{ row.ratio }}
+	      <div class="bg" style="width: {{ row.ratio }}"></div>
+	      <p>{{ row.categories }}</p>
 	    </td>
 	  </tr>
 	  {% endfor %}
