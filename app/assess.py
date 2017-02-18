@@ -30,13 +30,7 @@ def get_violence_ratios(all_docs, resp):
     violence_ratios.sort_values('ratio', ascending=False, inplace=True)
     violence_ratios.ratio = (violence_ratios.ratio * 100).map(
         '{:,.1f}%'.format)
-    violence_ratios.columns = [
-        '# total documents', '# matches', 'Risk score']
-    violence_ratios['Types of Violence (CDC,WHO, NIH, DOJ)'] = \
-        violence_ratios.index
-    cols = list(violence_ratios.columns)
-    cols = [cols.pop()] + cols
-    return violence_ratios[cols]
+    return violence_ratios
 
 
 def count_violence_tags(resp):
