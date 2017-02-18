@@ -30,6 +30,9 @@ def get_violence_ratios(all_docs, resp):
     violence_ratios.sort_values('ratio', ascending=False, inplace=True)
     violence_ratios['categories'] = pd.cut(
         violence_ratios.ratio, [0, .1, .2, 1], labels=['low', 'medium', 'high'])
+    violence_ratios['category_colors'] = pd.cut(
+        violence_ratios.ratio, [0, .1, .2, 1], labels=[
+            '250, 230, 10', '250, 130, 30', '250, 30, 30'])
     violence_ratios.ratio = (violence_ratios.ratio * 100).map(
         '{:,.1f}%'.format)
     return violence_ratios
