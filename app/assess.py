@@ -28,15 +28,14 @@ def get_violence_ratios(all_docs, resp):
 
     # Clean table for output
     violence_ratios.sort_values('ratio', ascending=False, inplace=True)
+    violence_ratios['categories'] = pd.cut(
+        violence_ratios.ratio, [0, .1, .2, 1], labels=['low', 'medium', 'high'])
+    violence_ratios['category_colors'] = pd.cut(
+        violence_ratios.ratio, [0, .1, .2, 1], labels=[
+            '250, 230, 10', '250, 130, 30', '250, 30, 30'])
     violence_ratios.ratio = (violence_ratios.ratio * 100).map(
         '{:,.1f}%'.format)
-    violence_ratios.columns = [
-        '# total documents', '# matches', 'Risk score']
-    violence_ratios['Types of Violence (CDC,WHO, NIH, DOJ)'] = \
-        violence_ratios.index
-    cols = list(violence_ratios.columns)
-    cols = [cols.pop()] + cols
-    return violence_ratios[cols]
+    return violence_ratios
 
 
 def count_violence_tags(resp):

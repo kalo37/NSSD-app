@@ -42,9 +42,7 @@ def search():
     ratios = get_violence_ratios(get_all_docs(), resp)
     return render_template(
         'search.html', page='search', num_hits_search=num_hits_search,
-        ratios=ratios.to_html(
-            classes='table table-hover table-bordered', index=False
-        )
+        ratios=ratios
     )
 
 

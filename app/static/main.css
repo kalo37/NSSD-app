@@ -124,7 +124,7 @@ h1, h2, h3, h4, h5 {
 /* Sections */
 
 section {
-    padding: 60px 0;
+    padding: 40px 0;
 }
 
 .section-heading {
@@ -206,4 +206,20 @@ form {
 
 #get-involved h5 {
   margin-top: 30px;
+}
+
+td {
+    position: relative;
+}
+.bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(220, 30, 30, .2);
+    z-index: 1;
+}
+td p {
+    position: absolute;
+    z-index: 2;
 }

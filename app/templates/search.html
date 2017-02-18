@@ -38,9 +38,28 @@
     {% if num_hits_search >= 0 %}
     <h2 style="margin-top: 30px;">Your results</h2>
     <p class="text-faded text-left">
-    {{ num_hits_search }} hits returned</p>
     <div class="table-responsive">
-      {{ ratios|safe }}
+      <table class="table table-hover table-bordered risk-table">
+	<thead>
+	  <col width="50%">
+	  <col width="50%">
+	  <tr style="text-align: right;">
+	    <th>Types of Violence (CDC,WHO, NIH, DOJ)</th>
+	    <th>Risk score</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  {% for index, row in ratios.iterrows() %}
+	  <tr>
+	    <td>{{ index }}</td>
+	    <td>
+		    <div class="bg" style="width: {{ row.ratio }}; background-color: rgba({{ row.category_colors }}, .2);"></div>
+	      <p>{{ row.categories }}</p>
+	    </td>
+	  </tr>
+	  {% endfor %}
+	</tbody>
+      </table>
     </div>
     </p>
     </section>
