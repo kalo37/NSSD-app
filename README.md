@@ -14,4 +14,4 @@ The Lantern is currently deployed as a Heroku [app](https://dashboard.heroku.com
 ## Mechanics
 The Lantern uses Bonsai ElasticSearch (via the [Python ElasticSearch Client](http://elasticsearch-py.readthedocs.io/en/master/)) to identify potential risk factors relating to school violence based on indexed text documents. Management of the ElasticSearch index and associated documents can be found in [this](https://github.com/NoSchoolViolence/search-app-documents) repository.
 
-Persistence is managed with a Heroku Postgres instance through [SQLAlchemy](https://www.sqlalchemy.org/), and user authentication is managed through [Stormpath](https://stormpath.com/).
+Persistence is managed with a Heroku Postgres instance through [SQLAlchemy](https://www.sqlalchemy.org/).

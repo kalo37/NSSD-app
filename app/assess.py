@@ -1,7 +1,6 @@
 import pandas as pd
 from collections import defaultdict
 from flask import request
-from flask_stormpath import user
 
 from app import db
 from models import Search
@@ -54,7 +53,7 @@ def get_matches(es):
     cname = request.form['search-terms']
 
     # Save search to db
-    _search = Search(user.get_id(), cname)
+    _search = Search('unauthenticated', cname)
     db.session.add(_search)
     db.session.commit()
 

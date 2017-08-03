@@ -28,7 +28,6 @@ flask-nav==0.5
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
 Flask-SSLify==0.1.5
-Flask-Stormpath==0.4.8
 Flask-WhooshAlchemy==0.56
 Flask-WhooshAlchemyPlus==0.7.5
 flask-whooshee==0.2.3
@@ -97,7 +96,6 @@ simplegeneric==0.8.1
 singledispatch==3.4.0.3
 six==1.10.0
 SQLAlchemy==1.0.15
-stormpath==2.4.4
 terminado==0.6
 tornado==4.4.1
 traitlets==4.3.0

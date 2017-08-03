@@ -1,14 +1,9 @@
 from flask import render_template, request
-from flask_stormpath import login_required, user
 
 from connect import get_all_docs, get_es
 from assess import get_violence_ratios, get_matches
 from app import app
 
-
-@app.context_processor
-def inject_user():
-    return dict(is_authenticated=user.is_authenticated)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -16,7 +11,6 @@ def index():
 
 
 @app.route('/ABD')
-@login_required
 def serve_ABD():
     return render_template('ABD.html')
 
@@ -27,7 +21,6 @@ def serve_about():
 
 
 @app.route('/search', methods=['GET', 'POST'])
-@login_required
 def search():
 
     es = get_es()
