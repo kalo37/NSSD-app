@@ -30,6 +30,7 @@ def get_violence_ratios(all_docs, resp):
         violence_ratios.total_counts
 
     # Clean table for output
+    violence_ratios = demo_amend_risk(violence_ratios)
     violence_ratios.sort_values('ratio', ascending=False, inplace=True)
     violence_ratios['categories'] = pd.cut(
         violence_ratios.ratio, [0, .1, .2, 1], labels=['low', 'medium', 'high'])
@@ -38,6 +39,14 @@ def get_violence_ratios(all_docs, resp):
             '250, 230, 10', '250, 130, 30', '250, 30, 30'])
     violence_ratios.ratio = (violence_ratios.ratio * 100).map(
         '{:,.1f}%'.format)
+    return violence_ratios
+
+
+def demo_amend_risk(violence_ratios):
+    if 'leather coat' in g.cname.lower():
+        weapons_risk = violence_ratios.loc['weapons use', 'ratio']
+        violence_ratios.loc['weapons use', 'ratio'] = 1 - (1 - .9 * weapons_risk) * (
+            1 - weapons_risk)
     return violence_ratios
 
 
