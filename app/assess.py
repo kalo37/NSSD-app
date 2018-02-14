@@ -4,15 +4,14 @@ from collections import defaultdict
 
 from app import db
 from models import Search
-
 from config import max_docs
 
 
 def get_violence_ratios(all_docs, relevant_docs):
     """Calculate the relevance of various forms of violence to a given search term.
 
-    Calculates relevance by normalizing search-specific violence tag counts with the total
-    violence tag counts across all indexed documents.
+    Calculates relevance by normalizing context-specific violence tag frequencies against the total
+    violence tag frequencies across all indexed documents.
 
     Arguments:
         - all_docs (list[dict]): list of all indexed documents
