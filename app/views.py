@@ -1,7 +1,8 @@
 """HTML views for web app."""
 from flask import render_template, request
 
-from connect import get_all_docs, get_es
+from connect import get_es
+from utils import get_all_docs
 from assess import get_violence_ratios, get_matches
 from app import app
 
