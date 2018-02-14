@@ -1,11 +1,13 @@
+"""Methods to connect to external services."""
 import os
 from flask import g
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 from config import max_docs
 
-# Connnect to AWS elasticsearch
+
 def _connect_es():
+    """Connnect to AWS elasticsearch."""
     host = os.environ['ES_HOST']
     es = Elasticsearch(
         hosts=host,
@@ -15,21 +17,21 @@ def _connect_es():
     return es
 
 
-# Connnect to local elasticsearch
 def _connect_es_local():
+    """Connnect to local elasticsearch."""
     es = Elasticsearch()
     return es
 
 
-# Opens a new elasticsearch connection if there is none yet for the
-# current application context
 def get_es():
+    """Open a new elasticsearch connection if there is none yet for the current application context."""
     if not hasattr(g, 'es_node'):
         g.es_node = _connect_es()
     return g.es_node
 
 
 def get_all_docs():
+    """Get all documents in the 'nssd' index with doc_type 'doc'."""
     if not hasattr(g, 'all_docs'):
         es = get_es()
         query = {"query": {"match_all": {}}, "size": max_docs}

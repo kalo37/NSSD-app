@@ -1,3 +1,4 @@
+"""Assess conditional violence-type relevance."""
 import pandas as pd
 from collections import defaultdict
 from flask import request
@@ -9,11 +10,22 @@ from config import max_docs
 
 
 def get_violence_ratios(all_docs, resp):
+    """Calculate the relevance of various forms of violence to a given search term.
+
+    Calculates relevance by normalizing search-specific violence tag counts with the total
+    violence tag counts across all indexed documents.
+
+    Arguments:
+        - all_docs (list[dict]): list of all indexed documents
+        - response (list[dict]): list of documents relevant to a particular search term
+    """
+    # calculate total violence tag counts across all indexed documents
     sum_violence_tags = count_violence_tags(all_docs)
     sum_violence_tags_df = pd.DataFrame.from_dict(
         sum_violence_tags, orient='index')
     sum_violence_tags_df.columns = ['total_counts']
 
+    # calculate violence tag counts specific to a given search term (specified in request form)
     if len(resp) > 0:
         n_violence_tags = count_violence_tags(resp)
         n_violence_tags_df = pd.DataFrame.from_dict(
@@ -23,13 +35,14 @@ def get_violence_ratios(all_docs, resp):
         n_violence_tags_df.ix[:, 0] = 0
     n_violence_tags_df.columns = ['query_counts']
 
+    # calculate relevancy as context-specific tag counts normalized by total tag counts
     violence_ratios = pd.merge(
         sum_violence_tags_df, n_violence_tags_df,
         left_index=True, right_index=True)
     violence_ratios['ratio'] = violence_ratios.query_counts /\
         violence_ratios.total_counts
 
-    # Clean table for output
+    # clean table for output
     violence_ratios.sort_values('ratio', ascending=False, inplace=True)
     violence_ratios['categories'] = pd.cut(
         violence_ratios.ratio, [0, .1, .2, 1], labels=['low', 'medium', 'high'])
@@ -38,25 +51,37 @@ def get_violence_ratios(all_docs, resp):
             '250, 230, 10', '250, 130, 30', '250, 30, 30'])
     violence_ratios.ratio = (violence_ratios.ratio * 100).map(
         '{:,.1f}%'.format)
+
     return violence_ratios
 
 
 def count_violence_tags(resp):
+    """Tabulate the count of each violence tag in a list of elasticsearch documents.
+
+    Arguments:
+        - resp (list[dict]): list of relevant documents returned by elasticsearch
+    """
     violence_tags_counts = defaultdict(float)
     for doc in resp:
         for tag in doc['_source']['violence_tags']:
             violence_tags_counts[tag] += doc['_score']
     return violence_tags_counts
 
-def get_matches(es):
 
+def get_matches(es):
+    """Read search terms from the current request from and return relevant documents from elasticsearch index.
+
+    Arguments:
+        - es: elasticsearch client connection
+    """
     cname = request.form['search-terms']
 
-    # Save search to db
+    # save search to db
     _search = Search('unauthenticated', cname)
     db.session.add(_search)
     db.session.commit()
 
+    # search elasticsearch index
     query = {"query": {"bool": {
         "should": [
             {"match": {"search_tags": {
@@ -67,5 +92,7 @@ def get_matches(es):
         "size": max_docs}
     resp = es.search(
         'nssd', 'doc', query,
-        _source_include=["violence_tags"])['hits']['hits']
-    return resp
+        _source_include=["violence_tags"])
+
+    # return only the hits, removing search meta data
+    return resp['hits']['hits']

@@ -1,3 +1,4 @@
+"""HTML views for web app."""
 from flask import render_template, request
 
 from connect import get_all_docs, get_es
@@ -7,22 +8,25 @@ from app import app
 
 @app.route('/', methods=['GET'])
 def index():
+    """Render index template."""
     return render_template('index.html')
 
 
 @app.route('/ABD')
-def serve_ABD():
+def serve_abd():
+    """Render dictionary template."""
     return render_template('ABD.html')
 
 
 @app.route('/about')
 def serve_about():
+    """Render the about template."""
     return render_template('about.html')
 
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-
+    """Render the search template."""
     es = get_es()
     num_hits_search = -1
     resp = []
@@ -41,16 +45,19 @@ def search():
 
 @app.errorhandler(401)
 def custom_401(error):
+    """Render 401 error template."""
     return render_template('401.html'), 401
 
 
 @app.errorhandler(404)
 def not_found(error):
+    """Render 404 error template."""
     return render_template('404.html'), 404
 
 
 @app.errorhandler(500)
 def internal_error(error):
+    """Render 500 error template."""
     return render_template('500.html'), 500
 
 

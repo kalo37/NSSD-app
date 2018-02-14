@@ -1,3 +1,4 @@
+"""Configuration methods and static variables."""
 import os
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
@@ -5,9 +6,7 @@ from flask_sslify import SSLify
 
 
 def set_config(app):
-    """Set configuration for Flask app
-    """
-
+    """Set configuration for Flask app."""
     SSLify(app)
     Bootstrap(app)
     app.config.from_object(os.environ['APP_SETTINGS'])
