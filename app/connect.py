@@ -1,14 +1,14 @@
 """Methods to connect to external services."""
-import os
 from flask import g
 from elasticsearch import Elasticsearch, RequestsHttpConnection
+
+from config import es_host
 
 
 def _connect_es():
     """Connnect to AWS elasticsearch."""
-    host = os.environ['ES_HOST']
     es = Elasticsearch(
-        hosts=host,
+        hosts=es_host,
         verify_certs=True,
         connection_class=RequestsHttpConnection
     )

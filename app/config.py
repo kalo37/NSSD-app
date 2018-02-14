@@ -19,3 +19,4 @@ def set_config(app):
 
 
 max_docs = 500
+es_host = os.environ['ES_HOST']
