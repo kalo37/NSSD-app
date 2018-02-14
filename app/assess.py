@@ -1,7 +1,6 @@
 """Assess conditional violence-type relevance."""
 import pandas as pd
 from collections import defaultdict
-from flask import request
 
 from app import db
 from models import Search
@@ -68,13 +67,13 @@ def count_violence_tags(docs):
     return violence_tags_counts
 
 
-def get_matches(es):
+def get_matches(es, context_terms):
     """Read search terms from the current request from and return relevant documents from elasticsearch index.
 
     Arguments:
         - es: elasticsearch client connection
+        - context_terms (list[str]): list of terms indicating the context under which to calculate violence-type relevance
     """
-    context_terms = request.form['search-terms']
     # save search to db
     _search = Search('unauthenticated', context_terms)
     db.session.add(_search)

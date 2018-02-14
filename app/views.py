@@ -33,7 +33,8 @@ def search():
 
     if request.method == "POST":
         # Get a count of documents with matching search tags
-        resp = get_matches(es)
+        context_terms = request.form['search-terms']
+        resp = get_matches(es, context_terms)
         num_hits_search = len(resp)
 
     ratios = get_violence_ratios(get_all_docs(), resp)
