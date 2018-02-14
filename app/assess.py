@@ -9,7 +9,7 @@ from models import Search
 from config import max_docs
 
 
-def get_violence_ratios(all_docs, resp):
+def get_violence_ratios(all_docs, relevant_docs):
     """Calculate the relevance of various forms of violence to a given search term.
 
     Calculates relevance by normalizing search-specific violence tag counts with the total
@@ -26,8 +26,8 @@ def get_violence_ratios(all_docs, resp):
     sum_violence_tags_df.columns = ['total_counts']
 
     # calculate violence tag counts specific to a given search term (specified in request form)
-    if len(resp) > 0:
-        n_violence_tags = count_violence_tags(resp)
+    if len(relevant_docs) > 0:
+        n_violence_tags = count_violence_tags(relevant_docs)
         n_violence_tags_df = pd.DataFrame.from_dict(
             n_violence_tags, orient='index')
     else:
@@ -55,14 +55,14 @@ def get_violence_ratios(all_docs, resp):
     return violence_ratios
 
 
-def count_violence_tags(resp):
+def count_violence_tags(docs):
     """Tabulate the count of each violence tag in a list of elasticsearch documents.
 
     Arguments:
-        - resp (list[dict]): list of relevant documents returned by elasticsearch
+        - docs (list[dict]): list of relevant documents returned by elasticsearch
     """
     violence_tags_counts = defaultdict(float)
-    for doc in resp:
+    for doc in docs:
         for tag in doc['_source']['violence_tags']:
             violence_tags_counts[tag] += doc['_score']
     return violence_tags_counts
@@ -74,10 +74,9 @@ def get_matches(es):
     Arguments:
         - es: elasticsearch client connection
     """
-    cname = request.form['search-terms']
-
+    context_terms = request.form['search-terms']
     # save search to db
-    _search = Search('unauthenticated', cname)
+    _search = Search('unauthenticated', context_terms)
     db.session.add(_search)
     db.session.commit()
 
@@ -88,11 +87,11 @@ def get_matches(es):
                 'query': s.strip(),
                 "fuzziness": "AUTO",
                 "minimum_should_match": "50%"}}}
-            for s in cname.split(';')]}},
+            for s in context_terms.split(';')]}},
         "size": max_docs}
-    resp = es.search(
+    response = es.search(
         'nssd', 'doc', query,
         _source_include=["violence_tags"])
 
     # return only the hits, removing search meta data
-    return resp['hits']['hits']
+    return response['hits']['hits']
